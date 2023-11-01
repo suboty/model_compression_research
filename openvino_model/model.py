@@ -33,10 +33,10 @@ class OpenVINOViTModel:
 
     @staticmethod
     def postprocess_result(result, top_n):
-        softmaxed_scores = softmax(result, -1)[0]
-        topk_labels = np.argsort(softmaxed_scores)[-top_n:][::-1]
-        topk_scores = softmaxed_scores[topk_labels]
-        return topk_labels, topk_scores
+        scores = softmax(result, -1)[0]
+        top_labels = np.argsort(scores)[-top_n:][::-1]
+        top_scores = scores[top_labels]
+        return top_labels, top_scores
 
     def predict(self, img):
         inputs = self.extractor(img, return_tensors="pt")["pixel_values"]
