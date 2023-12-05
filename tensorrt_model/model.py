@@ -8,16 +8,18 @@ class TensorRTViTModel:
         self.model = AutoModelForImageClassification.from_pretrained(path_to_model)
 
         self.tensorrt_model = None
+        self.model_convert()
 
-    def predict(self, img):
+    def predict(self, _model, img):
         model_id2label = {0: "cats", 1: "dogs"}
+        img = self.extractor(img, return_tensors="pt")["pixel_values"]
         output = self.tensorrt_model(img.cuda())
 
         predicted_label = output.logits[0].argmax(-1).item()
 
         return model_id2label[predicted_label]
 
-    def _get_size(self):
+    def get_size(self):
         param_size = 0
         for param in self.model.parameters():
             param_size += param.nelement() * param.element_size()
