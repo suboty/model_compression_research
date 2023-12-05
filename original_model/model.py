@@ -16,7 +16,7 @@ class ViTModel:
 
         return self.model.config.id2label[predicted_label]
 
-    def _get_size(self):
+    def get_size(self):
         param_size = 0
         for param in self.model.parameters():
             param_size += param.nelement() * param.element_size()
