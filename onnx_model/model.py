@@ -15,9 +15,12 @@ class ONNXViTModel:
         self.path_to_onnx_model = "vit.onnx"
         self.ort_session = None
 
-    def predict(self, img):
+        self.convert_model()
+
+    def predict(self, _model, img):
 
         model_id2label = {0: "cats", 1: "dogs"}
+        img = _model.extractor(img, return_tensors="pt")
         ort_inputs = {self.ort_session.get_inputs()[0].name: img['pixel_values'].numpy()}
         ort_outs = self.ort_session.run(None, ort_inputs)[0]
 
@@ -25,7 +28,7 @@ class ONNXViTModel:
 
         return model_id2label[predicted_label]
 
-    def _get_size(self):
+    def get_size(self):
         return os.path.getsize(self.path_to_onnx_model)/(1024**2)
 
     def convert_model(self):

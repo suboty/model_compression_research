@@ -14,7 +14,7 @@ class OpenVINOViTModel:
         self.compiled_openvino_model = None
         self.convert_model()
 
-    def _get_size(self):
+    def get_size(self):
         param_size = 0
         for param in self.model.parameters():
             param_size += param.nelement() * param.element_size()
