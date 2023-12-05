@@ -1,8 +1,8 @@
 import torch
 import openvino
-from numpy import np
+import numpy as np
 from scipy.special import softmax
-from openvino.tools.mo import convert_model
+from openvino.tools import mo
 from transformers import AutoFeatureExtractor, AutoModelForImageClassification
 
 
@@ -12,6 +12,7 @@ class OpenVINOViTModel:
         self.model = AutoModelForImageClassification.from_pretrained(path_to_model)
 
         self.compiled_openvino_model = None
+        self.convert_model()
 
     def _get_size(self):
         param_size = 0
@@ -25,7 +26,7 @@ class OpenVINOViTModel:
         return (param_size + buffer_size) / (1024 ** 2)
 
     def convert_model(self):
-        openvino_model = convert_model(self.model,
+        openvino_model = mo.convert_model(self.model,
                                        example_input=torch.randn(1, 3, 224, 224))
 
         core = openvino.Core()
@@ -38,7 +39,7 @@ class OpenVINOViTModel:
         top_scores = scores[top_labels]
         return top_labels, top_scores
 
-    def predict(self, img):
+    def predict(self, _model, img):
         inputs = self.extractor(img, return_tensors="pt")["pixel_values"]
         result = self.compiled_openvino_model(inputs)[0]
         predict, score = self.postprocess_result(result, top_n=1)
